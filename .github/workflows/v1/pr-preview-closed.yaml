@@ -1,0 +1,65 @@
+name: Preview Environment Workflow - Close
+
+on:
+  pull_request:
+    branches:
+      - dev
+    types:
+      - closed
+      - unlabeled
+
+jobs:
+  dispatch-delete-preview:
+    runs-on: ${{ fromJson(vars.RUNNER) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: "${{ secrets.KUBE_CORE_PAT }}"
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: false
+
+      - name: Declare variables
+        shell: bash
+        run: |
+          echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_ENV
+          echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+          echo "full_image_tag=${{ secrets.REGISTRY_URL_V2 }}/${{ vars.PROJECT_NAME }}/${{ github.event.repository.name }}:preview-${{ github.event.pull_request.number }}-${{ github.sha }}" >> $GITHUB_ENV
+          echo "plain_image_name=${{ secrets.REGISTRY_URL_V2 }}/${{ vars.PROJECT_NAME }}/${{ github.event.repository.name }}" >> $GITHUB_ENV
+          echo "app_name=${{ github.event.repository.name }}" >> $GITHUB_ENV
+          echo "base_project_domain=${{ vars.BASE_PROJECT_DOMAIN }}" >> $GITHUB_ENV
+
+      - name: Dispatch Kustomization Delete Event
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.KUBE_CORE_PAT }}
+          event-type: preview-application-delete-release
+          repository: ${{ github.repository_owner }}/${{vars.PROJECT_NAME}}-argo # TODO remove argo ?
+          client-payload: >-
+            {
+              "version": "preview-${{ github.event.pull_request.number }}-${{ github.sha }}",
+              "image": "${{ env.full_image_tag }}",
+              "app_name": "${{ env.app_name }}",
+              "pr_number": "${{ github.event.pull_request.number }}",
+              "pr_title": "${{ github.event.pull_request.title }}",
+              "pr_url": "${{ github.event.pull_request.html_url }}",
+              "plain_image_name": "${{ env.plain_image_name }}",
+              "base_project_domain" : "${{ env.base_project_domain }}"
+            }
+            
+      - name: Comment the overview on the PR
+        uses: mshick/add-pr-comment@v2
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          message: |
+            ## Preview Environment Status
+            
+            🚀 The preview environment for this pull request has been deleted.
+            
+            ### Deployment Details:
+            - **Application Name:** ${{ env.app_name }}
+            - **PR Number:** ${{ github.event.pull_request.number }}
+            - **PR Title:** ${{ github.event.pull_request.title }}
+            

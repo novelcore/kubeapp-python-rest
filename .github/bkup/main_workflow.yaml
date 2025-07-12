@@ -1,0 +1,232 @@
+name: Continues Integration
+
+on: 
+  pull_request:
+    types:
+      - synchronize
+      - opened
+      - reopened
+    paths:
+      - app/**
+jobs:
+  extract-commit-message:
+    runs-on: [self-hosted, linux, x64, novecore-1]
+    outputs:
+      commit_message: ${{ steps.set_commit_message.outputs.commit_message }}
+    steps:
+      - name: Set Commit Message
+        id: set_commit_message
+        run: echo "::set-output name=commit_message::${{ github.event.head_commit.message }}"
+
+  check-commit-message:
+      name: "Validate commit messaage with commitizen"
+      runs-on: [self-hosted, linux, x64, novecore-1]
+      needs: [extract-commit-message]
+      steps:
+
+        - name: checkout
+          uses: actions/checkout@v3
+          with:
+            fetch-depth: 0
+
+        - name: Switch to Current Branch
+          run: git checkout ${{ github.event.pull_request.head.ref }}
+
+        - uses: actions/setup-python@v4
+          with:
+            python-version: 3.11
+            architecture: x64
+            cache: 'pip'
+
+        - name: Install dependencies
+          run: |
+            pip install -U commitizen
+            pip install pre-commit
+            pre-commit install
+        # https://github.com/commitizen-tools/commitizen/blob/master/docs/check.md
+
+        - name: Check commit message 
+          run: |
+            COMMIT_SHA="${{ github.event.pull_request.head.sha }}"
+            COMMIT_MESSAGE=$(git log --format=%B -n 1 $COMMIT_SHA)
+            if [ -z "$COMMIT_MESSAGE" ]; then
+              echo "Skipping commit message check as it is empty."
+            else
+              echo "Commit Message: $COMMIT_MESSAGE"
+              cz check --message "$COMMIT_MESSAGE"
+            fi
+        - name: Check file contents
+          run: |
+            pre-commit run --all-files
+
+  # unit-tests:
+  #   # skip the build if the commit refferences docs action
+  #   if: "!startsWith(github.event.head_commit.message, 'docs:')"
+  #   # needs: [check-commit-message]
+  #   # Add matrix in case you want to test multiple cases
+  #   # strategy:
+  #   #   matrix:
+  #   #     python-version: ['3.9','3.10','3.11']
+  #   runs-on: [self-hosted, linux, x64, novecore-1] 
+  #   defaults:
+  #     run:
+  #       working-directory: app/
+
+  #   steps:
+  #     - name: checkout
+  #       uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0
+
+  #     # - name: Switch to Current Branch
+  #     #   run: git checkout ${{ github.event.pull_request.head.ref }}
+  #     - uses: actions/setup-python@v4
+  #       with:
+  #         python-version: 3.11
+  #         architecture: x64
+  #         cache: 'pip'
+
+  #     - name: Install Poetry
+  #       run: |
+  #         python -m pip install --upgrade pip
+  #         python -m pip install poetry
+
+  #     - name: Install Application
+  #       run: |
+  #         poetry install
+
+  #     - name: Lint with flake8
+  #       run: |
+  #         # stop the build if there are Python syntax errors or undefined names
+  #         poetry run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+  #         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+  #         poetry run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+  #     - name: Test with pytest
+  #       run: |
+  #         poetry run pytest -v
+
+  bump-application-version:
+    if: "!startsWith(github.event.head_commit.message, 'bump:')"
+    runs-on: ubuntu-latest
+    needs: [check-commit-message]
+    name: "Bump version and create changelog with commitizen"
+    steps:
+      - name: Check out
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          token: "${{ secrets.REPO_TOKEN }}"
+      - id: cz
+        name: Create bump and changelog
+        uses: commitizen-tools/commitizen-action@master
+        with:
+          github_token: ${{ secrets.REPO_TOKEN }}
+          branch: ${{ github.event.pull_request.head.ref }}
+      - name: Print Version
+        run: echo "Bumped to version ${{ steps.cz.outputs.version }}"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.REPO_TOKEN }}
+          branch: ${{ github.event.pull_request.head.ref }}
+          force: true
+
+  build-n-push-image:
+    # skip the build if the commit refferences docs action
+    if: "!startsWith(github.event.head_commit.message, 'docs:')"
+    runs-on: [self-hosted, linux, x64, novecore-1] #,local-gfi
+    needs: [ bump-application-version] # unit-tests,
+    # defaults:
+    #   run:
+    #     working-directory: app/
+    steps:
+        - uses: actions/checkout@v3
+          with:
+            token: "${{ secrets.REPO_TOKEN }}"
+            fetch-depth: 0 # Mandatory to use the extract version from tag action
+            ref: ${{ github.event.pull_request.head.ref }}
+
+        - #https://github.com/SebRollen/toml-action
+          name: Extract version from toml
+          uses: SebRollen/toml-action@v1.0.1
+          id: read_toml
+          with:
+            file: 'pyproject.toml'
+            field: 'tool.commitizen.version'
+            # You can now refer to the output in a later step using steps.read_toml.outputs.value
+        - 
+          # https://github.com/docker/login-action
+          name: Login to private registry
+          uses: docker/login-action@v2
+          with:
+            registry: ${{ secrets.REGISTRY_URL }}
+            username:  ${{ secrets.BOT_REGISTRY_USERNAME }}
+            password:  ${{ secrets.BOT_REGISTRY_PWD }}
+        - 
+          # https://github.com/docker/metadata-action
+          name: Extract Docker metadata
+          id: meta
+          uses: docker/metadata-action@v4
+          with:
+            images: ${{ secrets.REGISTRY_URL }}/${{ github.event.repository.name }}
+            tags: |
+              type=semver,pattern={{version}},value=${{ steps.read_toml.outputs.value }}
+              type=semver,pattern={{major}}.{{minor}},value=${{ steps.read_toml.outputs.value }}
+              type=semver,pattern={{major}}.{{minor}}.{{patch}},value=${{ steps.read_toml.outputs.value }}
+              type=semver,pattern={{major}},value=${{ steps.read_toml.outputs.value }}
+              type=ref,event=branch,suffix=-{{ sha }}
+            flavor: |
+              latest=false
+
+        - name: Compute final image tags
+          id: tags
+          run: |
+            echo "tags<<EOF" >> $GITHUB_OUTPUT
+            echo '${{ steps.meta.outputs.tags }}' >> $GITHUB_OUTPUT
+            if [ -n '${{ inputs.publish_dockerhub }}' ]; then
+              echo '${{ steps.meta_dockerhub.outputs.tags }}' >> $GITHUB_OUTPUT
+            fi
+            echo "EOF" >> $GITHUB_OUTPUT
+        -
+          name: Set up QEMU
+          uses: docker/setup-qemu-action@v2
+        -
+          name: Set up Docker Buildx
+          uses: docker/setup-buildx-action@v2
+        
+        -
+          name: Build and push
+          uses: docker/build-push-action@v5
+          with:
+            context: app/
+            platforms: linux/amd64,linux/arm64
+            push: true
+            tags: ${{ steps.meta.outputs.tags }}
+            labels: ${{ steps.meta.outputs.labels }}    
+        
+  dispatch-kustomization-update:
+    runs-on: [self-hosted, linux, x64, novecore-1]
+    needs: [build-n-push-image]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: "${{ secrets.REPO_TOKEN }}"
+          fetch-depth: 0 # Mandatory to use the extract version from tag action
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Extract version from toml
+        uses: SebRollen/toml-action@v1.0.1
+        id: read_toml
+        with:
+          file: 'pyproject.toml'
+          field: 'tool.commitizen.version'
+
+      - name: Dispatch Kustomization Update Event
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.REPO_TOKEN }}
+          event-type: update-kustomization-deliberate-web-app
+          repository: novelcore/deliberate-argo  # Repository owner and name
+          client-payload: '{"version": "${{ steps.read_toml.outputs.value }}","image": "${{ secrets.REGISTRY_URL }}/${{ github.event.repository.name }}"}'
+

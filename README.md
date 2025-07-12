@@ -1,2 +1,3 @@
-# kubeapp-python-rest
-Kubeapp Template for python REST development within Kubecore Platform 
+# kubeapp-python-rc-demo
+test
+sexy test
