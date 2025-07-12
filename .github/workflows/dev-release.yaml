@@ -266,12 +266,22 @@ jobs:
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
           SHORT_SHA="${{ github.sha }}"
           
+          # Debug variable values before constructing image name
+          echo "🔍 Debug values for image construction:"
+          echo "NEW_VERSION: $NEW_VERSION"
+          echo "TIMESTAMP: $TIMESTAMP"
+          echo "SHORT_SHA: ${SHORT_SHA:0:7}"
+          echo "KUBECORE_REGISTRY: '${{ env.KUBECORE_REGISTRY }}'"
+          echo "KUBECORE_KUBEPROJECT_REPO: '${{ env.KUBECORE_KUBEPROJECT_REPO }}'"
+          echo "APP_NAME: '${{ env.APP_NAME }}'"
+          
           # Dev version format: dev-v1.2.3-20230506-abc1234
           IMAGE_TAG="dev-v${NEW_VERSION}-${TIMESTAMP}-${SHORT_SHA:0:7}"
           FULL_IMAGE_NAME="${{ env.KUBECORE_REGISTRY }}/${{ env.KUBECORE_KUBEPROJECT_REPO }}/${{ env.APP_NAME }}:${IMAGE_TAG}"
           
           echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
           echo "full_image_name=${FULL_IMAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "🏷️ Final Results:"
           echo "Image tag: ${IMAGE_TAG}"
           echo "Full image name: ${FULL_IMAGE_NAME}"
           
@@ -299,6 +309,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
+      - name: Debug environment variables
+        run: |
+          echo "🔍 Debugging Environment Variables:"
+          echo "KUBECORE_REGISTRY: '${{ env.KUBECORE_REGISTRY }}'"
+          echo "KUBECORE_KUBEPROJECT_REPO: '${{ env.KUBECORE_KUBEPROJECT_REPO }}'"
+          echo "APP_NAME: '${{ env.APP_NAME }}'"
+          echo "KUBECORE_REGISTRY_UNAME: [$(if [ -n '${{ env.KUBECORE_REGISTRY_UNAME }}' ]; then echo 'SET'; else echo 'EMPTY'; fi)]"
+          echo "KUBECORE_REGISTRY_PWD: [$(if [ -n '${{ env.KUBECORE_REGISTRY_PWD }}' ]; then echo 'SET'; else echo 'EMPTY'; fi)]"
+          echo "📋 Variable lengths:"
+          echo "KUBECORE_REGISTRY length: ${#KUBECORE_REGISTRY}"
+          echo "KUBECORE_KUBEPROJECT_REPO length: ${#KUBECORE_KUBEPROJECT_REPO}"
+          
       - name: Set build variables
         run: |
           echo "REGISTRY_URL=${{ env.KUBECORE_REGISTRY }}" >> $GITHUB_ENV
