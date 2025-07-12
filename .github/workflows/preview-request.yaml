@@ -210,11 +210,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Debug environment variables
+        run: |
+          echo "🔍 Debugging Preview Environment Variables:"
+          echo "KUBECORE_REGISTRY: '${{ env.KUBECORE_REGISTRY }}'"
+          echo "KUBECORE_KUBEPROJECT_REPO: '${{ env.KUBECORE_KUBEPROJECT_REPO }}'"
+          echo "APP_NAME: '${{ env.APP_NAME }}'"
+          echo "PR_NUMBER: '${{ env.PR_NUMBER }}'"
+          echo "SHORT_SHA: '${{ env.SHORT_SHA }}'"
+          echo "KUBECORE_REGISTRY_UNAME: [$(if [ -n '${{ env.KUBECORE_REGISTRY_UNAME }}' ]; then echo 'SET'; else echo 'EMPTY'; fi)]"
+          echo "KUBECORE_REGISTRY_PWD: [$(if [ -n '${{ env.KUBECORE_REGISTRY_PWD }}' ]; then echo 'SET'; else echo 'EMPTY'; fi)]"
+
       - name: Set image tag
         id: set-image-tag
         run: |
           IMAGE_TAG="preview-${{ env.PR_NUMBER }}-${{ env.SHORT_SHA }}"
-          FULL_IMAGE_NAME="${{ env.REGISTRY_URL_V2 }}/${{ env.KUBECORE_KUBEPROJECT_REPO }}/${{ env.APP_NAME }}:${IMAGE_TAG}"
+          FULL_IMAGE_NAME="${{ env.KUBECORE_REGISTRY }}/${{ env.KUBECORE_KUBEPROJECT_REPO }}/${{ env.APP_NAME }}:${IMAGE_TAG}"
           echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
           echo "full_image_name=${FULL_IMAGE_NAME}" >> $GITHUB_OUTPUT
           echo "Image tag: ${IMAGE_TAG}"
@@ -223,7 +234,7 @@ jobs:
       - name: Login to private registry
         uses: docker/login-action@v2
         with:
-          registry: ${{ env.REGISTRY_URL_V2 }}
+          registry: ${{ env.KUBECORE_REGISTRY }}
           username: ${{ env.KUBECORE_REGISTRY_UNAME }}
           password: ${{ env.KUBECORE_REGISTRY_PWD }}
 
@@ -238,7 +249,7 @@ jobs:
           tags: ${{ steps.set-image-tag.outputs.full_image_name }}
           provenance: false
           build-args: |
-            REGISTRY_URL=${{ env.REGISTRY_URL_V2 }}
+            REGISTRY_URL=${{ env.KUBECORE_REGISTRY }}
             KUBECORE_KUBEPROJECT_REPO=${{ env.KUBECORE_KUBEPROJECT_REPO }}
             VERSION=${{ steps.set-image-tag.outputs.image_tag }}
 
