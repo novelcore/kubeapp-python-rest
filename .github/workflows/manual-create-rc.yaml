@@ -111,7 +111,7 @@ jobs:
             const { data: pr } = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `🚀 Release v${version} to Production`,
+              title: `🚀 Release Candidate v${version} to Staging`,
               body: `## Release Candidate v${version}
 
               This PR represents the promotion of version ${version} to production.
