@@ -1,5 +1,5 @@
 #!/bin/bash
-PROMPT="Hello! Please analyze this codebase and suggest what I should work on first."
+PROMPT="@welcome-agent"
 
 # Open Cursor
 cursor . &
