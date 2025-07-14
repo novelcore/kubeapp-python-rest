@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Check if this is a recognized project structure
-if [ -f "pyproject.toml" ] && [ -f "app/main.py" ]; then
+if [ -f "app/pyproject.toml" ] && [ -f "app/app/main.py" ]; then
     PROMPT="Hello! I'm your Kubecore DevOps Assistant. Welcome to your Python REST API repository!
 
 🎯 **You're in your Python REST API repository**

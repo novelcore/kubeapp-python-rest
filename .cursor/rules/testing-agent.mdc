@@ -191,7 +191,7 @@ find app -name "*.py" -type f | grep -E "(main|core|routers)" | head -20
 **2. Generate Test Files**:
 For each module, create corresponding test files:
 ```python
-# Example: tests/test_health.py
+# Example: app/tests/test_health.py
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
@@ -236,14 +236,14 @@ def test_function_with_external_dependency(mock_external_service):
 
 **1. Run Test Suite**:
 ```bash
-# Run all tests with verbose output
-pytest -v
+# Run all tests with verbose output (from parent directory)
+cd app && pytest -v
 
 # Run specific test file
-pytest tests/test_{module}.py -v
+cd app && pytest tests/test_{module}.py -v
 
 # Run with coverage
-pytest --cov=app --cov-report=html --cov-report=term-missing
+cd app && pytest --cov=app --cov-report=html --cov-report=term-missing
 ```
 
 **2. Analyze Results**:
@@ -608,7 +608,7 @@ class Test{module_name}:
 ### Coverage Analysis
 ```bash
 # Generate coverage report
-pytest --cov=app --cov-report=json --cov-report=html
+cd app && pytest --cov=app --cov-report=json --cov-report=html
 
 # Parse coverage results
 python -c "

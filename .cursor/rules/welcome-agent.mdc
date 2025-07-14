@@ -335,7 +335,7 @@ if [ -n "$VIRTUAL_ENV" ]; then
 fi
 
 # Check if dependencies are installed
-if [ -f "poetry.lock" ]; then
+if [ -f "app/poetry.lock" ]; then
   echo "📦 Dependencies managed with Poetry"
 fi
 ```

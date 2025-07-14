@@ -150,9 +150,11 @@ Once information is gathered, create a comprehensive PRD:
 
 3. **Create PRD file in repository**:
    ```bash
-   mkdir -p docs/prds
-   echo "$PRD_CONTENT" > "docs/prds/${PRD_TITLE_SLUG}.md"
-   git add "docs/prds/${PRD_TITLE_SLUG}.md"
+# Create docs/prds directory if it doesn't exist
+mkdir -p "docs/prds"
+
+echo "$PRD_CONTENT" > "docs/prds/${PRD_TITLE_SLUG}.md"
+git add "docs/prds/${PRD_TITLE_SLUG}.md"
    git commit -m "docs: Add PRD for ${PRD_TITLE}"
    ```
 
@@ -226,7 +228,7 @@ Once information is gathered, create a comprehensive PRD:
 
 2. **Run Tests**:
    ```bash
-   pytest tests/test_{endpoint_name}.py -v
+   cd app && pytest tests/test_{endpoint_name}.py -v
    ```
 
 #### Phase 6: Commit and Push Changes
@@ -470,7 +472,7 @@ Fix: {What I'm changing}
   • Endpoint: {method} /{endpoint_path}
   • Models: app/app/core/fastapi/models/{models_file}.py
   • Router: app/app/core/fastapi/routers/{router_file}.py
-  • Tests: tests/test_{endpoint_name}.py
+  • Tests: app/tests/test_{endpoint_name}.py
 
 🚀 **Feature Branch Ready:**
   • Branch: feature/{prd-title-slug}
@@ -502,17 +504,18 @@ Would you like me to connect you with the Release Manager now, {USER_NAME}?
 ### File Structure Management
 Always maintain proper file organization:
 ```
-app/
+kubeapp-python-rest/
 ├── app/
-│   ├── core/
-│   │   └── fastapi/
-│   │       ├── models/
-│   │       │   └── {endpoint_name}_models.py
-│   │       └── routers/
-│   │           └── {endpoint_name}.py
-│   └── main.py
-├── tests/
-│   └── test_{endpoint_name}.py
+│   ├── app/
+│   │   ├── core/
+│   │   │   └── fastapi/
+│   │   │       ├── models/
+│   │   │       │   └── {endpoint_name}_models.py
+│   │   │       └── routers/
+│   │   │           └── {endpoint_name}.py
+│   │   └── main.py
+│   └── tests/
+│       └── test_{endpoint_name}.py
 └── docs/
     └── prds/
         └── {prd-title-slug}.md

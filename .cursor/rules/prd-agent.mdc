@@ -317,7 +317,10 @@ Once requirements are gathered, create comprehensive PRD using TaskMaster MCP:
    PRD_FILENAME="prd-$(echo "$FEATURE_NAME" | tr ' ' '-' | tr '[:upper:]' '[:lower:]').md"
    
    # Save PRD as Markdown file
-   cat > "docs/prds/$PRD_FILENAME" << EOF
+   # Create docs/prds directory if it doesn't exist
+mkdir -p "docs/prds"
+
+cat > "docs/prds/$PRD_FILENAME" << EOF
    # PRD: $FEATURE_NAME
    
    **Version:** 1.0
@@ -436,33 +439,34 @@ Once requirements are gathered, create comprehensive PRD using TaskMaster MCP:
    # Create PR for PRD review
    git push origin "$PRD_BRANCH"
    
-   # Create GitHub PR for PRD review
-   gh pr create --title "PRD: $FEATURE_NAME" \
-     --body "## PRD Review Request
-   
-   **Feature:** $FEATURE_NAME
-   **PRD Version:** 1.0
-   **Author:** $USER_NAME
-   
-   ### Summary
-   This PRD documents the requirements for $FEATURE_NAME.
-   
-   ### Review Checklist
-   - [ ] Problem statement is clear and justified
-   - [ ] Solution approach is appropriate
-   - [ ] Requirements are complete and testable
-   - [ ] Implementation plan is realistic
-   - [ ] Acceptance criteria are measurable
-   - [ ] Testing strategy is comprehensive
-   
-   ### Next Steps
-   After approval, this PRD will be used to guide implementation.
-   
-   **Files Changed:**
-   - docs/prds/$PRD_FILENAME
-   
-   Please review and provide feedback." \
-     --base dev --head "$PRD_BRANCH"
+   # Create GitHub PR for PRD review with simple formatting
+   PRD_BODY="PRD Review Request for $FEATURE_NAME
+
+Author: $USER_NAME
+PRD Version: 1.0
+
+Summary: This PRD documents the requirements for $FEATURE_NAME.
+
+Review Checklist:
+- Problem statement is clear and justified
+- Solution approach is appropriate  
+- Requirements are complete and testable
+- Implementation plan is realistic
+- Acceptance criteria are measurable
+- Testing strategy is comprehensive
+
+Next Steps: After approval, this PRD will guide implementation.
+
+Files Changed: docs/prds/$PRD_FILENAME
+
+Please review and provide feedback."
+
+   # Use GitHub CLI with simplified arguments
+   gh pr create \
+     --title "PRD: $FEATURE_NAME" \
+     --body "$PRD_BODY" \
+     --base dev \
+     --head "$PRD_BRANCH"
    ```
 
 2. **Approval Process**:
@@ -515,11 +519,11 @@ Once requirements are gathered, create comprehensive PRD using TaskMaster MCP:
      
      echo "🔍 Validating acceptance criteria for PRD $PRD_ID..."
      
-     # Run acceptance tests
-     pytest tests/acceptance/test_${FEATURE_NAME}.py -v
-     
-     # Check coverage
-     pytest --cov=app --cov-report=term-missing
+        # Run acceptance tests
+   cd app && pytest tests/acceptance/test_${FEATURE_NAME}.py -v
+   
+   # Check coverage
+   cd app && pytest --cov=app --cov-report=term-missing
      
      # Validate API endpoints
      curl -f "http://localhost:8000/api/feature-endpoint"
