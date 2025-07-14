@@ -102,13 +102,20 @@ class PrometheusMiddleware(BaseHTTPMiddleware):
         else:
             status_code = response.status_code
             after_time = time.perf_counter()
-            # retrieve trace id for exemplar
-            span = trace.get_current_span()
-            trace_id = trace.format_trace_id(
-                span.get_span_context().trace_id)
+            # retrieve trace id for exemplar (only if observability is enabled)
+            exemplar = {}
+            if app_config.observability_enabled:
+                try:
+                    span = trace.get_current_span()
+                    trace_id = trace.format_trace_id(
+                        span.get_span_context().trace_id)
+                    exemplar = {'TraceID': trace_id}
+                except Exception:
+                    # If OpenTelemetry is not properly initialized, continue without exemplar
+                    pass
 
             REQUESTS_PROCESSING_TIME.labels(method=method, path=path, app_name=self.app_name).observe(
-                after_time - before_time, exemplar={'TraceID': trace_id}
+                after_time - before_time, exemplar=exemplar
             )
         finally:
             RESPONSES.labels(method=method, path=path,

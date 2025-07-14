@@ -7,21 +7,27 @@ from app.core.fastapi.routers import health
 
 app = FastAPI()
 
-# Setting metrics middleware
-app.add_middleware(PrometheusMiddleware, app_name=app_config.app_name)
-app.add_route("/metrics", metrics)
+# Setting metrics middleware (only if observability is enabled)
+if app_config.observability_enabled:
+    app.add_middleware(PrometheusMiddleware, app_name=app_config.app_name)
+    app.add_route("/metrics", metrics)
 # include routers
 app.include_router(health.router)
 
-# Setting OpenTelemetry exporter
-setting_otlp(app, app_config.app_name, app_config.otlp_grpc_endpoint)
+# Setting OpenTelemetry exporter (only if observability is enabled)
+if app_config.observability_enabled:
+    setting_otlp(app, app_config.app_name, app_config.otlp_grpc_endpoint)
 
-# Filter out /endpoint
-logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
+# Filter out /endpoint (only if observability is enabled)
+if app_config.observability_enabled:
+    logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
 def start():
     # update uvicorn access logger format
     log_config = uvicorn.config.LOGGING_CONFIG
-    log_config["formatters"]["access"]["fmt"] = "%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] [trace_id=%(otelTraceID)s span_id=%(otelSpanID)s resource.service.name=%(otelServiceName)s] - %(message)s"
+    if app_config.observability_enabled:
+        log_config["formatters"]["access"]["fmt"] = "%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] [trace_id=%(otelTraceID)s span_id=%(otelSpanID)s resource.service.name=%(otelServiceName)s] - %(message)s"
+    else:
+        log_config["formatters"]["access"]["fmt"] = "%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] - %(message)s"
     # uvicorn.run(app, host="0.0.0.0", port=int(app_config.port), log_config=log_config, timeout_keep_alive=0)
 
     uvicorn.run(

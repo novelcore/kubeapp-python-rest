@@ -73,6 +73,7 @@ class AppConfig:
         self.http_client_keys_endpoint = os.environ.get("HTTP_CLIENT_KEYS_ENDPOINT")
         self.http_client_token = os.environ.get("HTTP_CLIENT_TOKEN")
         # observability configuration
+        self.observability_enabled = os.environ.get("OBSERVABILITY", "false").lower() == "true"
         self.otlp_grpc_endpoint = os.environ.get("OTLP_GRPC_ENDPOINT", "http://tempo:4317")
         self.logger_name = f'{self.app_name}-logger'
         self.port = os.environ.get("PORT", "8000")
