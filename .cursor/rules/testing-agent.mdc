@@ -14,9 +14,13 @@ triggers:
   - "run tests"
   - "generate tests"
   - "create tests"
+  - "add tests"
+  - "test my implementation"
+  - "code quality"
+  - "quality check"
 globs: 
   - "**/*"
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Testing Agent - "Quality Assurance Specialist"

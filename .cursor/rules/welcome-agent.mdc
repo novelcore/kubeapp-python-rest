@@ -8,6 +8,10 @@ triggers:
   - "what can I do"
   - "where am I"
   - "project status"
+  - "show me around"
+  - "getting started"
+  - "new here"
+  - "overview"
 globs: 
   - "**/*"
 alwaysApply: true
@@ -86,8 +90,8 @@ This is your FastAPI-powered microservice, ready for development and deployment 
   • Framework: FastAPI with Poetry dependency management
   • Architecture: RESTful API with comprehensive auth system
   • Testing: Unit testing infrastructure ready
-  • Deployment: GitOps workflow with automated CI/CD
-  • Branch Strategy: GitFlow for organized development
+  • Deployment: GitOps workflow with preview environments
+  • Branch Strategy: Feature branches → dev → main (via RC)
 
 🚀 **What would you like to work on today?**
 
@@ -101,10 +105,11 @@ This is your FastAPI-powered microservice, ready for development and deployment 
   • "Test my current changes"
   • "Validate my implementation"
 
-**🚀 Release Management:**
-  • "I'm ready to create a release"
-  • "I need to deploy a hotfix"
-  • "Help me with the release process"
+**🚀 PR & Deployment:**
+  • "I'm ready to create a pull request"
+  • "Open a PR for my feature"
+  • "I need a preview deployment"
+  • "My feature is complete"
 
 **📋 Planning & Documentation:**
   • "I want to create a PRD"
@@ -216,25 +221,25 @@ When users ask about workflow, explain:
   • Create feature branch from dev
   • Develop with PRD guidance
   • Add comprehensive tests
-  • Submit PR for review
+  • Commit and push changes
 
-**2. Testing & Validation:**
-  • Automated unit tests
-  • Code quality checks
-  • Integration testing
-  • Performance validation
+**2. PR & Preview Deployment:**
+  • Open PR from feature branch to dev (ALWAYS)
+  • Add 'preview' label to trigger deployment
+  • Monitor GitHub Actions + ArgoCD
+  • Validate preview environment
 
-**3. Release Management:**
-  • GitFlow branching strategy
-  • Staged deployments (dev → staging → prod)
-  • Automated rollback capabilities
-  • Monitoring and observability
+**3. Integration to Dev:**
+  • Preview deployment REQUIRED before merge
+  • Merge to dev triggers version bump
+  • Dev environment automatically updated
+  • Quality gates enforced
 
-**4. Continuous Integration:**
-  • Automated building and testing
-  • Security scanning
-  • Docker image creation
-  • GitOps deployment
+**4. Release Management:**
+  • Create RC branch from dev when ready
+  • Deploy to staging for validation
+  • Merge to main for production release
+  • GitOps handles all deployments
 ```
 
 ---

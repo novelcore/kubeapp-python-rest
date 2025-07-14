@@ -12,9 +12,12 @@ triggers:
   - "build endpoint"
   - "REST endpoint"
   - "HTTP endpoint"
+  - "API endpoint"
+  - "FastAPI endpoint"
+  - "build a new"
 globs: 
   - "**/*"
-alwaysApply: true
+alwaysApply: false
 ---
 
 # New Endpoint Agent - "API Builder"
@@ -226,7 +229,7 @@ Once information is gathered, create a comprehensive PRD:
    pytest tests/test_{endpoint_name}.py -v
    ```
 
-#### Phase 6: GitHub Integration
+#### Phase 6: Commit and Push Changes
 1. **Commit Changes**:
    ```bash
    git add .
@@ -245,15 +248,29 @@ Once information is gathered, create a comprehensive PRD:
    git push origin "$FEATURE_BRANCH"
    ```
 
-3. **Create Pull Request using GitHub MCP**:
-   Use GitHub MCP to create a pull request:
-   ```json
-   {
-     "title": "feat: ${ENDPOINT_NAME} endpoint",
-     "body": "## Overview\n\nImplements ${ENDPOINT_NAME} endpoint as specified in PRD.\n\n## Changes\n\n- Added Pydantic models\n- Created FastAPI router\n- Implemented endpoint handler\n- Added comprehensive tests\n\n## Testing\n\n- [ ] Unit tests pass\n- [ ] Integration tests pass\n- [ ] Manual testing completed\n\n## PRD Reference\n\nReferences: docs/prds/${PRD_TITLE_SLUG}.md",
-     "base": "dev",
-     "head": "${FEATURE_BRANCH}"
-   }
+3. **Ready for PR Creation**:
+   ```
+   ✅ **Feature Implementation Complete!**
+   
+   Your ${ENDPOINT_NAME} endpoint is now ready for integration:
+   
+   📋 **What's been completed:**
+   • PRD created and saved
+   • Feature branch created from dev
+   • Pydantic models implemented
+   • FastAPI router created
+   • Comprehensive tests added
+   • All changes committed and pushed
+   
+   🎯 **Next Steps - Handoff to Release Manager:**
+   Now that your feature is complete, you'll need to create a PR to dev branch.
+   The Release Manager will help you:
+   • Open PR from feature branch to dev branch
+   • Add preview label for deployment testing
+   • Monitor CI/CD pipeline and ArgoCD
+   • Ensure successful merge to dev
+   
+   Ready to create your PR and deploy for testing?
    ```
 
 ---
@@ -446,7 +463,7 @@ Fix: {What I'm changing}
 
 ### Completion Summary
 ```
-🎉 Excellent work, {USER_NAME}! Your {endpoint_name} endpoint is ready for review.
+🎉 Excellent work, {USER_NAME}! Your {endpoint_name} endpoint is ready for integration.
 
 📊 **Implementation Summary:**
   • PRD: docs/prds/{prd-title-slug}.md
@@ -455,23 +472,27 @@ Fix: {What I'm changing}
   • Router: app/app/core/fastapi/routers/{router_file}.py
   • Tests: tests/test_{endpoint_name}.py
 
-🔗 **Pull Request Created:**
+🚀 **Feature Branch Ready:**
   • Branch: feature/{prd-title-slug}
-  • PR: #{pr_number}
-  • Review URL: {pr_url}
+  • All changes committed and pushed
+  • Ready for PR creation
 
 🧪 **Testing Results:**
   • Unit tests: ✅ {test_count} tests passing
   • Coverage: ✅ 100% coverage achieved
   • Integration: ✅ All validations passing
 
-📋 **Next Steps:**
-  1. Review the pull request
-  2. Request team review if needed
-  3. Merge to dev branch when approved
-  4. Test in development environment
+📋 **Next Steps - Handoff to Release Manager:**
+  1. Create PR from feature branch to dev branch
+  2. Add preview label for deployment testing
+  3. Monitor CI/CD pipeline (GitHub Actions + ArgoCD)
+  4. Validate preview deployment
+  5. Merge to dev when preview is successful
 
-Would you like me to help with anything else, {USER_NAME}?
+🎯 **Ready for Release Manager?**
+Your feature implementation is complete! The Release Manager will now help you create the PR and manage the deployment process to get your endpoint integrated into dev.
+
+Would you like me to connect you with the Release Manager now, {USER_NAME}?
 ```
 
 ---

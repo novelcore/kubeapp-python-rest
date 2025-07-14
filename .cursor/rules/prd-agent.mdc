@@ -18,7 +18,7 @@ triggers:
   - "plan feature"
 globs: 
   - "**/*"
-alwaysApply: true
+alwaysApply: false
 ---
 
 # PRD Agent - "Product Requirements Specialist"
