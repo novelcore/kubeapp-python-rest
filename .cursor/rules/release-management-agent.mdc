@@ -140,18 +140,124 @@ echo "  5. 🚀 Ready for merge to dev deployment branch"
 
 ## Workflow Guidance
 
-### New Release Process
+### Feature-to-Dev PR Process
 
-**Step 1: Development Complete**
+**Step 1: Create PR from Feature Branch to Dev**
 ```bash
-# Verify feature branch ready for dev
-git checkout dev
-git pull origin dev
-git merge feature/my-feature
-git push origin dev
+# Create PR from feature branch to dev (REQUIRED)
+FEATURE_BRANCH=$(git branch --show-current)
+REPO_URL=$(git config remote.origin.url | sed 's/.*github\.com[:/]\([^/]*\/[^/.]*\).*/\1/')
 
-echo "✅ Changes merged to dev - dev-release.yaml will trigger"
-echo "🔍 Monitor: https://github.com/$(git config remote.origin.url | sed 's/.*github\.com[:/]\([^/]*\/[^/.]*\).*/\1/')/actions"
+echo "🔄 Creating PR from ${FEATURE_BRANCH} to dev branch..."
+echo "📋 Opening GitHub PR interface..."
+
+# Open PR creation page
+open "https://github.com/${REPO_URL}/compare/dev...${FEATURE_BRANCH}"
+```
+
+**Step 2: PR Created - Human-in-the-Loop Validation Required**
+
+After creating your PR, you'll need to validate your changes before merging:
+
+```bash
+REPO_URL=$(git config remote.origin.url | sed 's/.*github\.com[:/]\([^/]*\/[^/.]*\).*/\1/')
+echo "✅ PR created successfully!"
+echo ""
+echo "📍 **Important Locations:**"
+echo "   🔗 Your PR: https://github.com/${REPO_URL}/pulls"
+echo "   📊 GitHub Actions: https://github.com/${REPO_URL}/actions"
+echo "   🔍 Files changed: Check 'Files changed' tab in your PR"
+echo ""
+echo "🚨 **HUMAN-IN-THE-LOOP VALIDATION REQUIRED**"
+echo "   This is a mandatory validation of your concept before merging to dev codebase."
+echo "   You must manually validate your changes in a preview environment."
+echo ""
+echo "🎯 **Next Step: Preview Deployment**"
+echo "   A preview deployment is REQUIRED before merging to dev."
+echo "   The preview environment will be created and deployment details"
+echo "   will appear as comments on your PR by the Kubecore platform."
+```
+
+**Step 3: Preview Deployment Decision**
+
+Would you like me to create the preview deployment for you, or would you prefer to do it yourself?
+
+**Option A: Agent Creates Preview**
+```bash
+# Agent will add preview label to PR
+PR_NUMBER=$(gh pr view --json number -q '.number')
+gh pr edit ${PR_NUMBER} --add-label "preview"
+
+echo "🏷️ Preview label added to PR #${PR_NUMBER}"
+echo "🚀 Preview deployment will begin shortly..."
+echo "📋 Monitor the PR for deployment status and URL from Kubecore platform"
+```
+
+**Option B: User Creates Preview**
+```bash
+echo "📋 **To create preview deployment yourself:**"
+echo "   1. Go to your PR: https://github.com/${REPO_URL}/pulls"
+echo "   2. Click on your PR"
+echo "   3. Add the 'preview' label to your PR"
+echo "   4. Wait for Kubecore platform to comment with preview URL"
+echo ""
+echo "🏷️ **Preview Label Required:** 'preview'"
+echo "🔍 **Expected Result:** Preview URL and deployment details in PR comments"
+```
+
+**Step 4: Preview Validation Process**
+
+Once the preview deployment is ready:
+
+```bash
+echo "🔍 **Preview Validation Checklist:**"
+echo "   ✅ Preview environment accessible via URL in PR comments"
+echo "   ✅ New functionality works as expected"
+echo "   ✅ No breaking changes to existing features"
+echo "   ✅ API endpoints respond correctly"
+echo "   ✅ Integration tests pass in preview environment"
+echo ""
+echo "📋 **PR Status Monitoring:**"
+echo "   • Check PR comments for preview URL from Kubecore platform"
+echo "   • Monitor GitHub Actions for deployment status"
+echo "   • Validate all CI/CD checks pass"
+echo ""
+echo "⚠️  **IMPORTANT:** Do NOT merge until preview validation is complete!"
+echo "    The preview deployment is a branch protection requirement."
+```
+
+**Step 5: Merge to Dev After Validation**
+
+Only after successful preview validation:
+
+```bash
+echo "✅ **Ready to Merge Checklist:**"
+echo "   ✅ Preview deployment successful"
+echo "   ✅ Manual validation completed"
+echo "   ✅ All GitHub Actions passing"
+echo "   ✅ Code review approved"
+echo "   ✅ Preview environment tested and functional"
+echo ""
+echo "🚀 **Merge Process:**"
+echo "   1. Return to your PR"
+echo "   2. Click 'Merge pull request'"
+echo "   3. Confirm merge to dev branch"
+echo "   4. Monitor dev-release.yaml workflow execution"
+```
+
+### Post-Merge Dev Deployment
+
+**Step 6: Monitor Dev Release**
+```bash
+# After PR merge to dev, track deployment progress
+KUBEAPP=$(basename $(pwd))
+ORG=$(git config remote.origin.url | sed -n 's/.*github\.com[:/]\([^/]*\).*/\1/p')
+
+echo "📊 Monitoring Dev Deployment:"
+echo "🔗 GitOps Repository: https://github.com/${ORG}/${KUBECORE_KUBEPROJECT_REPO}"
+echo "🌿 Watch branch: kubenv/kubeapp/${KUBEAPP}/dev-next"
+echo "📋 Expected PR: dev-next → dev"
+echo "🎯 ArgoCD Application: ${KUBEAPP}-dev"
 ```
 
 **Step 2: Monitor Dev Deployment**

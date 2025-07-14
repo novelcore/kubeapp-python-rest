@@ -1,10 +1,7 @@
 #!/bin/bash
 
-# Get the welcome agent content
-WELCOME_AGENT_FILE=".cursor/rules/welcome-agent.mdc"
-
-if [ -f "$WELCOME_AGENT_FILE" ]; then
-    # Extract just the welcome message part from the agent file
+# Check if this is a recognized project structure
+if [ -f "pyproject.toml" ] && [ -f "app/main.py" ]; then
     PROMPT="Hello! I'm your Kubecore DevOps Assistant. Welcome to your Python REST API repository!
 
 🎯 **You're in your Python REST API repository**
@@ -48,14 +45,17 @@ Just tell me what you'd like to work on, and I'll connect you with the right spe
 
 The specialized agents are available through the .cursor/rules system and will automatically activate based on your requests."
 else
-    PROMPT="Hello! Please analyze this codebase and suggest what I should work on first."
+    PROMPT="Hello! Please analyze this codebase and suggest what I should work on first. @Kubecore DevOps Assistant"
 fi
 
 # Open Cursor
 cursor . &
 sleep 4
 
-# Send prompt to Cursor
+# Copy the prompt to clipboard using pbcopy
+echo "$PROMPT" | pbcopy
+
+# Send prompt to Cursor using AppleScript
 osascript << EOF
 tell application "Cursor"
     activate
@@ -68,8 +68,8 @@ tell application "System Events"
         keystroke "l" using {command down}
         delay 1
         
-        # Type the prompt
-        keystroke "$PROMPT"
+        # Paste the prompt from clipboard
+        keystroke "v" using {command down}
         delay 0.5
         
         # Submit with Enter
