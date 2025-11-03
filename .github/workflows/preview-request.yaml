@@ -28,7 +28,7 @@ env:
 jobs:
   # ENHANCED GATE JOB - Fast exit with proper label validation
   gate-check:
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     outputs:
       should_process: ${{ steps.check.outputs.should_process }}
       has_preview_label: ${{ steps.check.outputs.has_preview_label }}
@@ -124,7 +124,7 @@ jobs:
   log-other-label-skip:
     needs: gate-check
     if: needs.gate-check.outputs.action_type == 'skip_other_label'
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     steps:
       - name: Log non-preview label skip
         run: |
@@ -138,7 +138,7 @@ jobs:
   ensure-environment:
     needs: gate-check
     if: needs.gate-check.outputs.should_process == 'true' && needs.gate-check.outputs.has_preview_label == 'true' && needs.gate-check.outputs.is_cleanup == 'false'
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     steps:
       - name: Generate GitHub App token
         id: create_token
@@ -202,7 +202,7 @@ jobs:
   build-scan-push:
     needs: gate-check
     if: needs.gate-check.outputs.should_process == 'true' && needs.gate-check.outputs.has_preview_label == 'true' && needs.gate-check.outputs.is_cleanup == 'false'
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.set-image-tag.outputs.image_tag }}
       full_image_name: ${{ steps.set-image-tag.outputs.full_image_name }}
@@ -256,7 +256,7 @@ jobs:
   deploy-preview:
     needs: [gate-check, build-scan-push, ensure-environment]
     if: needs.gate-check.outputs.should_process == 'true' && needs.gate-check.outputs.has_preview_label == 'true' && needs.gate-check.outputs.is_cleanup == 'false'
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     permissions:
       deployments: write
       pull-requests: write
@@ -378,7 +378,7 @@ jobs:
   cleanup-preview:
     needs: gate-check
     if: needs.gate-check.outputs.is_cleanup == 'true' || needs.gate-check.outputs.is_label_removal == 'true'
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     permissions:
       deployments: write
       pull-requests: write
@@ -503,7 +503,7 @@ jobs:
   log-merge-back-skip:
     needs: gate-check
     if: needs.gate-check.outputs.is_merge_back == 'true'
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     permissions:
       statuses: write
       pull-requests: write
@@ -573,7 +573,7 @@ jobs:
   log-no-preview-label:
     needs: gate-check
     if: needs.gate-check.outputs.should_process == 'false' && needs.gate-check.outputs.is_merge_back == 'false' && needs.gate-check.outputs.is_cleanup == 'false'
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     permissions:
       statuses: write
     steps:

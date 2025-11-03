@@ -13,7 +13,7 @@ env:
 
 jobs:
   cleanup-branches:
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     
