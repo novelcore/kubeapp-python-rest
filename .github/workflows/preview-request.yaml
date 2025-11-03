@@ -224,8 +224,12 @@ jobs:
       - name: Set image tag
         id: set-image-tag
         run: |
+          # KUBECORE_REGISTRY already contains full repository path
+          # Extract registry host for docker login
+          REGISTRY_HOST=$(echo "${{ env.KUBECORE_REGISTRY }}" | cut -d'/' -f1)
+          echo "REGISTRY_HOST=${REGISTRY_HOST}" >> $GITHUB_ENV
           IMAGE_TAG="preview-${{ env.PR_NUMBER }}-${{ env.SHORT_SHA }}"
-          FULL_IMAGE_NAME="${{ env.KUBECORE_REGISTRY }}/${{ env.KUBECORE_KUBEPROJECT_REPO }}/${{ env.APP_NAME }}:${IMAGE_TAG}"
+          FULL_IMAGE_NAME="${{ env.KUBECORE_REGISTRY }}:${IMAGE_TAG}"
           echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
           echo "full_image_name=${FULL_IMAGE_NAME}" >> $GITHUB_OUTPUT
           echo "Image tag: ${IMAGE_TAG}"
@@ -234,7 +238,7 @@ jobs:
       - name: Login to private registry
         uses: docker/login-action@v2
         with:
-          registry: ${{ env.KUBECORE_REGISTRY }}
+          registry: ${{ env.REGISTRY_HOST }}
           username: ${{ env.KUBECORE_REGISTRY_UNAME }}
           password: ${{ env.KUBECORE_REGISTRY_PWD }}
           ecr: false
