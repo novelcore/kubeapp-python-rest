@@ -323,15 +323,17 @@ jobs:
           
       - name: Set build variables
         run: |
-          echo "REGISTRY_URL=${{ env.KUBECORE_REGISTRY }}" >> $GITHUB_ENV
-          echo "IMAGE_NAME=${{ env.KUBECORE_KUBEPROJECT_REPO }}/${{ env.APP_NAME }}" >> $GITHUB_ENV
+          # KUBECORE_REGISTRY already contains full repository path
+          # Extract registry host for docker login
+          REGISTRY_HOST=$(echo "${{ env.KUBECORE_REGISTRY }}" | cut -d'/' -f1)
+          echo "REGISTRY_HOST=${REGISTRY_HOST}" >> $GITHUB_ENV
           echo "IMAGE_TAG=${{ needs.handle-merged-pr.outputs.image_tag }}" >> $GITHUB_ENV
-          echo "FULL_IMAGE_NAME=${{ env.KUBECORE_REGISTRY }}/${{ env.KUBECORE_KUBEPROJECT_REPO }}/${{ env.APP_NAME }}:${{ needs.handle-merged-pr.outputs.image_tag }}" >> $GITHUB_ENV
+          echo "FULL_IMAGE_NAME=${{ env.KUBECORE_REGISTRY }}:${{ needs.handle-merged-pr.outputs.image_tag }}" >> $GITHUB_ENV
 
       - name: Login to private registry
         uses: docker/login-action@v2
         with:
-          registry: ${{ env.KUBECORE_REGISTRY }}
+          registry: ${{ env.REGISTRY_HOST }}
           username: ${{ env.KUBECORE_REGISTRY_UNAME }}
           password: ${{ env.KUBECORE_REGISTRY_PWD }}
           ecr: false
