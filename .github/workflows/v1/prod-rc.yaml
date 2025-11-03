@@ -46,6 +46,7 @@ jobs:
           registry: ${{ secrets.REGISTRY_URL_V2 }}
           username: ${{ secrets.CI_BOT_REGISTRY_NAME_V2 }}
           password: ${{ secrets.CI_BOT_REGISTRY_PWD_V2 }}
+          ecr: false
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -80,6 +81,7 @@ jobs:
           registry: ${{ secrets.REGISTRY_URL_V2 }}
           username: ${{ secrets.CI_BOT_REGISTRY_NAME_V2 }}
           password: ${{ secrets.CI_BOT_REGISTRY_PWD_V2 }}
+          ecr: false
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -114,6 +116,7 @@ jobs:
           registry: ${{ secrets.REGISTRY_URL_V2 }}
           username: ${{ secrets.CI_BOT_REGISTRY_NAME_V2 }}
           password: ${{ secrets.CI_BOT_REGISTRY_PWD_V2 }}
+          ecr: false
 
       - name: Create and verify multi-arch manifest
         run: |

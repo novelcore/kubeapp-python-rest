@@ -137,6 +137,7 @@ jobs:
           registry: ${{ env.KUBECORE_REGISTRY }}
           username: ${{ env.KUBECORE_REGISTRY_UNAME }}
           password: ${{ env.KUBECORE_REGISTRY_PWD }}
+          ecr: false
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
