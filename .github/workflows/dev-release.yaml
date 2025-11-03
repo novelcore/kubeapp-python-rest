@@ -26,7 +26,7 @@ jobs:
 
   # SINGLE GATE JOB - determines if we should proceed at all
   gate-check:
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     outputs:
       should_process: ${{ steps.check.outputs.should_process }}
       branch_type: ${{ steps.check.outputs.branch_type }}
@@ -75,7 +75,7 @@ jobs:
   validate-pr:
     needs: gate-check
     if: needs.gate-check.outputs.should_process == 'true' && github.event_name == 'pull_request'
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
@@ -133,7 +133,7 @@ jobs:
   handle-merged-pr:
     needs: gate-check
     if: needs.gate-check.outputs.should_process == 'true' && github.event_name == 'pull_request_target' && github.event.pull_request.merged == true
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: read
@@ -304,7 +304,7 @@ jobs:
   build-dev-image:
     needs: handle-merged-pr
     if: needs.handle-merged-pr.outputs.branch_type != 'chore' && needs.handle-merged-pr.outputs.branch_type != 'rc' && github.event_name == 'pull_request_target' && github.event.pull_request.merged == true
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -354,7 +354,7 @@ jobs:
   notify-gitops-repository:
     needs: [handle-merged-pr, build-dev-image]
     if: needs.handle-merged-pr.outputs.branch_type != 'chore' && needs.handle-merged-pr.outputs.branch_type != 'rc' && github.event_name == 'pull_request_target' && github.event.pull_request.merged == true
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     steps:
       - name: Generate token
         id: create_token
@@ -404,7 +404,7 @@ jobs:
   create-rc-branch:
     needs: [handle-merged-pr, build-dev-image, notify-gitops-repository]
     if: needs.handle-merged-pr.outputs.create_rc_branch == 'true' && needs.handle-merged-pr.outputs.branch_type != 'chore' && needs.handle-merged-pr.outputs.branch_type != 'rc' && github.event_name == 'pull_request_target' && github.event.pull_request.merged == true
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
@@ -544,7 +544,7 @@ jobs:
   notify-rc-option:
     needs: [handle-merged-pr, build-dev-image, notify-gitops-repository]
     if: needs.handle-merged-pr.outputs.create_rc_branch != 'true' && needs.handle-merged-pr.outputs.branch_type != 'chore' && needs.handle-merged-pr.outputs.branch_type != 'rc' && github.event_name == 'pull_request_target' && github.event.pull_request.merged == true
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     permissions:
       pull-requests: write
     steps:
@@ -584,7 +584,7 @@ jobs:
   log-merge-back-skip:
     needs: gate-check  
     if: needs.gate-check.outputs.is_merge_back == 'true'
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     steps:
       - name: Log merge-back skip
         run: |

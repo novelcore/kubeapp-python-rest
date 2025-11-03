@@ -14,7 +14,7 @@ env:
 jobs:
   determine_version:
     if: github.event.pull_request.merged == true
-    runs-on: ${{ fromJson(vars.RUNNER) }}
+    runs-on: ubuntu-latest
     outputs:
       new_version: ${{ steps.bump_version.outputs.new }}
     steps:
@@ -72,7 +72,7 @@ jobs:
 
   build-scan-push-amd:
     needs: determine_version
-    runs-on: ${{ fromJson(vars.RUNNER) }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -106,7 +106,7 @@ jobs:
             
   build-scan-push-arm:
     needs: determine_version
-    runs-on: ${{ fromJson(vars.RUNNER_ARM) }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -139,7 +139,7 @@ jobs:
             VERSION=${{ needs.determine_version.outputs.new_version }}
 
   create-multiarch-manifest:
-    runs-on: ${{ fromJson(vars.RUNNER) }}
+    runs-on: ubuntu-latest
     needs: [determine_version, build-scan-push-amd, build-scan-push-arm]
     steps:
       - name: Install regctl
@@ -165,7 +165,7 @@ jobs:
         
   update_version_and_tag:
     needs: [determine_version, build-scan-push-arm, build-scan-push-amd, create-multiarch-manifest]
-    runs-on: ${{ fromJson(vars.RUNNER) }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -192,7 +192,7 @@ jobs:
 
   dispatch_update:
     needs: [determine_version, build-scan-push-arm, build-scan-push-amd,create-multiarch-manifest, update_version_and_tag]
-    runs-on: ${{ fromJson(vars.RUNNER) }}
+    runs-on: ubuntu-latest
     steps:
       - name: Dispatch Kustomization Update Event
         uses: peter-evans/repository-dispatch@v2

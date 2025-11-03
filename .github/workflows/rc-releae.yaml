@@ -30,7 +30,7 @@ env:
 jobs:
   # Add a gate check to ensure this is an RC branch PR
   validate-rc-pr:
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     outputs:
       is_rc_branch: ${{ steps.check-branch.outputs.is_rc_branch }}
       branch_name: ${{ steps.check-branch.outputs.branch_name }}
@@ -60,7 +60,7 @@ jobs:
   prepare-rc:
     needs: validate-rc-pr
     if: needs.validate-rc-pr.outputs.is_rc_branch == 'true'
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       issues: write
@@ -229,7 +229,7 @@ jobs:
 
   build-rc-image:
     needs: prepare-rc
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -266,7 +266,7 @@ jobs:
 
   create-deployment:
     needs: [prepare-rc, build-rc-image]
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     environment: staging
     outputs:
       deployment_id: ${{ steps.deployment.outputs.deployment_id }}
@@ -306,7 +306,7 @@ jobs:
 
   create-prerelease:
     needs: [prepare-rc, build-rc-image]
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     outputs:
@@ -385,7 +385,7 @@ jobs:
 
   notify-team:
     needs: [prepare-rc, build-rc-image, create-prerelease]
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       issues: write
@@ -568,7 +568,7 @@ jobs:
 
   notify-gitops-repository:
     needs: [prepare-rc, build-rc-image, create-deployment, create-prerelease]
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     steps:
       - name: Generate token
         id: create_token

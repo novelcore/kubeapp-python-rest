@@ -25,7 +25,7 @@ jobs:
   # Build hotfix image when pushing to hotfix branch
   build-hotfix-image:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/hotfix/')
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.set-image-tag.outputs.image_tag }}
       full_image_name: ${{ steps.set-image-tag.outputs.full_image_name }}
@@ -186,7 +186,7 @@ jobs:
   # Handle merged hotfix to main
   deploy-hotfix:
     if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'hotfix/')
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     outputs:
       production_tag: ${{ steps.create-tag.outputs.production_tag }}
       full_image_name: ${{ steps.build-prod-image.outputs.full_image_name }}
@@ -262,7 +262,7 @@ jobs:
   # Notify GitOps for expedited deployment
   notify-gitops-expedited:
     needs: deploy-hotfix
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     steps:
       - name: Generate token
         id: create_token
@@ -294,7 +294,7 @@ jobs:
   # Create GitHub release for hotfix
   create-hotfix-release:
     needs: [deploy-hotfix, notify-gitops-expedited]
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
@@ -347,7 +347,7 @@ jobs:
   # Sync hotfix back to dev
   sync-hotfix-to-dev:
     needs: [deploy-hotfix, create-hotfix-release]
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
@@ -414,7 +414,7 @@ jobs:
   hotfix-summary:
     needs: [deploy-hotfix, notify-gitops-expedited, create-hotfix-release, sync-hotfix-to-dev]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/hotfix/')
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     steps:
       - name: Comment on PR
         uses: actions/github-script@v6

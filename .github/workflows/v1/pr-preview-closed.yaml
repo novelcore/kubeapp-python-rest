@@ -10,7 +10,7 @@ on:
 
 jobs:
   dispatch-delete-preview:
-    runs-on: ${{ fromJson(vars.RUNNER) }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

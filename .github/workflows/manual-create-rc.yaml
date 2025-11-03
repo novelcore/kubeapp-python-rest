@@ -14,7 +14,7 @@ env:
 
 jobs:
   create-rc-branch:
-    runs-on: ${{ fromJson(vars.KUBECORE_RUNNERS) }}
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
