@@ -381,7 +381,7 @@ jobs:
               "branch_type": "${{ needs.handle-merged-pr.outputs.branch_type }}",
               "pr_title": "${{ github.event.pull_request.title }}",
               "pr_url": "${{ github.event.pull_request.html_url }}",
-              "plain_image_name": "${{ env.KUBECORE_REGISTRY }}/${{ env.KUBECORE_KUBEPROJECT_REPO }}/${{ env.APP_NAME }}"
+              "plain_image_name": "${{ env.KUBECORE_REGISTRY }}"
             }
 
       - name: Comment on PR about dev deployment
