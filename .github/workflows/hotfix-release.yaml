@@ -243,7 +243,7 @@ jobs:
         id: build-prod-image
         run: |
           PRODUCTION_TAG="${{ steps.create-tag.outputs.production_tag }}"
-          FULL_IMAGE_NAME="${{ env.KUBECORE_REGISTRY }}/${{ env.KUBECORE_KUBEPROJECT_REPO }}/${{ env.APP_NAME }}:${PRODUCTION_TAG}"
+          FULL_IMAGE_NAME="${{ env.KUBECORE_REGISTRY }}:${PRODUCTION_TAG}"
           
           echo "full_image_name=${FULL_IMAGE_NAME}" >> $GITHUB_OUTPUT
           
@@ -258,10 +258,10 @@ jobs:
             ./app
           
           docker push "${FULL_IMAGE_NAME}"
-          
+
           # Also tag as latest
-          docker tag "${FULL_IMAGE_NAME}" "${{ env.KUBECORE_REGISTRY }}/${{ env.KUBECORE_KUBEPROJECT_REPO }}/${{ env.APP_NAME }}:latest"
-          docker push "${{ env.KUBECORE_REGISTRY }}/${{ env.KUBECORE_KUBEPROJECT_REPO }}/${{ env.APP_NAME }}:latest"
+          docker tag "${FULL_IMAGE_NAME}" "${{ env.KUBECORE_REGISTRY }}:latest"
+          docker push "${{ env.KUBECORE_REGISTRY }}:latest"
 
   # Notify GitOps for expedited deployment
   notify-gitops-expedited:
@@ -292,7 +292,7 @@ jobs:
               "merged_by": "${{ github.event.pull_request.merged_by.login }}",
               "is_hotfix": true,
               "expedited": true,
-              "plain_image_name": "${{ env.KUBECORE_REGISTRY }}/${{ env.KUBECORE_KUBEPROJECT_REPO }}/${{ env.APP_NAME }}"
+              "plain_image_name": "${{ env.KUBECORE_REGISTRY }}"
             }
 
   # Create GitHub release for hotfix
