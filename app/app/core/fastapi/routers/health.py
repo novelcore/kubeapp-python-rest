@@ -10,3 +10,7 @@ async def health_check():
 @router.get("/healthz")
 async def health_check():
     return HealthResponse(status="up")
+
+@router.get("/health")
+async def health_check():
+    return HealthResponse(status="up")
