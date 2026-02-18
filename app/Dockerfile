@@ -13,7 +13,6 @@ RUN apk add --no-cache \
     libffi-dev \
     pkgconf \
     gcc \
-    python3-dev \
     curl
 
 # Create nonroot user's home directory and set ownership
@@ -70,6 +69,11 @@ RUN mkdir -p /home/nonroot/wheels && \
 # Configure poetry
 RUN poetry config installer.max-workers 1 && \
     poetry config virtualenvs.create false
+
+# Prefer pre-built binary wheels over source builds.
+# pydantic-core and grpcio ship cp314 wheels; without this they fall back to
+# source compilation which fails against the bundled PyO3 / GCC 15 in the image.
+ENV PIP_PREFER_BINARY=1
 
 # Install project dependencies
 RUN poetry install --no-interaction --no-cache --only main --no-root
