@@ -19,10 +19,11 @@ This directory contains the AI agent system for your Python REST API repository.
 - **Triggers**: "test", "unit test", "testing", "validate", "coverage"
 - **Purpose**: Generates unit tests and ensures code quality
 
-### 4. **Release Management Agent** (`release-management-agent.mdc`)
+### 4. **Release Management Agent** (`release-management-agent.mdc`) + **Release Manager** (Cursor & Claude)
 - **Role**: Release Coordinator
 - **Triggers**: "release", "deploy", "hotfix", "production", "staging"
 - **Purpose**: Manages GitFlow releases and deployment monitoring
+- **Agents**: Cursor rule in `.cursor/rules/`; specialized **release-manager** agent in `.cursor/agents/release-manager.md` (Cursor) and `.claude/agents/release-manager.md` (Claude Code) for GitOps promotion and overlay paths.
 
 ### 5. **PRD Agent** (`prd-agent.mdc`)
 - **Role**: Product Requirements Specialist
