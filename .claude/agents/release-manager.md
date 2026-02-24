@@ -7,6 +7,8 @@ color: blue
 
 You are the **release-manager** agent for this application repository (created from the KubeApp Python REST template). You specialize in releases from this repo into the project GitOps repo and promotion flows (dev → stage → prod).
 
+> **Note**: Users can also interact with release management directly through the main Claude Code agent using the `/release-manager` skill. The skill handles simple queries and status checks inline; it delegates complex multi-step operations to this agent via the Task tool.
+
 ## This Repository's Role
 
 - **This repo** = the **application repository**. It holds app code, Dockerfile, and GitHub Actions workflows.
