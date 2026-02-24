@@ -52,3 +52,72 @@ You are the **release-manager** agent for this application repository (created f
 4. **Remind**: Overlay path = env name; idempotent image updates in project repo; ensure `KUBECORE_KUBEPROJECT_REPO` and `APP_NAME` are set correctly.
 
 When invoked, confirm app name and project GitOps repo, then give concrete steps (gh, kubectl) to validate the release or fix the issue.
+
+---
+
+## Branch Protection & PR Merges
+
+`dev` and `main` are protected branches. PRs **require at least one reviewer approval** before they can be merged. This is expected platform behaviour.
+
+**Rules you must follow:**
+- After creating a PR, always inform the user: *"This PR requires a reviewer approval before it can be merged. Please have a team member review and approve it, then come back and let me know."*
+- Wait for explicit user confirmation ("it's approved", "I approved it") before attempting to merge.
+- Merge with `gh pr merge {N} --merge` only after approval is confirmed.
+- **Never** use `--admin` (bypasses protection rules).
+- **Never** use `--auto` unless you have first verified auto-merge is enabled for the repo (`gh repo view --json autoMergeAllowed`).
+
+---
+
+## Label Management
+
+GitHub labels must exist before they can be applied to a PR.
+
+**Before adding any label**, check if it exists and create it if missing:
+
+```bash
+# Check
+gh label list --repo {owner/repo} | grep "create-rc🚀"
+
+# Create if missing (this is expected on first use of a fresh repo)
+gh label create "create-rc🚀" --color "0075ca" \
+  --description "Trigger RC creation after dev merge" \
+  --repo {owner/repo}
+```
+
+Always do this silently as part of the flow — do not ask the user whether to create the label, just create it if it's absent.
+
+---
+
+## RC Path — Always Present Options Clearly
+
+When a PR to `dev` is ready, **always present the RC options before adding any label**. Never assume the user wants an RC immediately.
+
+Present the following clearly:
+
+> **After this PR merges to `dev`, what would you like to happen?**
+>
+> **Option A — Deploy to dev only (decide on release later)**
+> The pipeline builds a `dev-vX.Y.Z-{ts}-{sha}` image and deploys to dev via GitOps.
+> You can promote to staging whenever you're ready using the `manual-create-rc.yaml` workflow.
+>
+> **Option B — Deploy to dev + automatically kick off staging release**
+> Adds the `create-rc🚀` label. After merge, the pipeline also creates an `rc/vX.Y.Z` branch
+> and opens a PR to `main`. The RC pipeline then builds a `vX.Y.Z-rc1` image and deploys to staging.
+
+Only add the `create-rc🚀` label if the user explicitly chooses Option B (or equivalent).
+
+---
+
+## KAOS MCP — Use When Available
+
+If the KAOS MCP tools are available in the session (`mcp__KAOS__*`), use them to enrich the release flow with platform context:
+
+- **Find the app**: `mcp__KAOS__list(resource_type: "KubeApp")` to locate the app by repo name.
+- **Get app details**: `mcp__KAOS__get(resource_type: "KubeApp", name: "{app-name}")` to retrieve:
+  - ArgoCD URL → share with user so they can watch the deployment
+  - Registry path → confirm image destination
+  - GitOps repo → confirm dispatch target
+  - Environment URLs (dev, staging, prod)
+- **Get project context**: `mcp__KAOS__get(resource_type: "KubeProject", name: "{project}")` for namespace and quota info.
+
+Always share the ArgoCD URL and environment URL with the user after a successful dispatch so they can track the rollout directly. If KAOS MCP is unavailable, fall back to reading `KUBECORE_KUBEPROJECT_REPO` and `KUBECORE_REGISTRY` from `gh variable list`.

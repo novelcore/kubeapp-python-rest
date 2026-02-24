@@ -248,6 +248,10 @@ New work needed?
 - Skip the GitOps dispatch — it is the deployment trigger
 - Manually tag `vX.Y.Z` unless the pipeline fails and a recovery tag is needed
 - Merge RC to main before staging deployment succeeds
+- Use `gh pr merge --admin` — this bypasses branch protection rules
+- Use `gh pr merge --auto` without first verifying auto-merge is enabled for the repo
+- Add the `create-rc🚀` label without asking the user first — RC is not always the desired next step
+- Try to add a label that doesn't exist — always create it first with `gh label create`
 
 ---
 
