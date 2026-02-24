@@ -26,19 +26,19 @@ services:
       - loki
     environment:
       APP_NAME: "app-a"
-      PROJECT_ID: "250134510207762737"
-      ZITADEL_DOMAIN: "https://zitadel.godfather.novelcore.org"
-      ZITADEL_TOKEN_URL: "https://zitadel.godfather.novelcore.org/oauth/v2/token"
-      ZITADEL_AUTH_URL: "https://zitadel.godfather.novelcore.org/oauth/v2/authorize"
-      ZITADEL_JWK_URL: "https://zitadel.godfather.novelcore.org/oauth/v2/keys"
-      ZITADEL_REVOKE_URL: "https://zitadel.godfather.novelcore.org/oauth/v2/revoke"
-      CLIENT_ID: "homelander"
-      CLIENT_SECRET: "blWu3PVglAl72QtF1YjahhMdubZMcAjYVojZwOMkBAJUZgHAR1jXG52v2vfSK4uZ"
-      ZITADEL_INTROSPECTION_URL: "https://zitadel.godfather.novelcore.org/oauth/v2/introspect"
-      API_CLIENT_ID: "250135022969880881@masterplan"
-      API_CLIENT_SECRET: "hDIxptx67wWS5vaxZDWHVAcAik0JnL7VUd7ya2sPOPtWxys0s5VujpBixa7tNtoA"
+      PROJECT_ID: "${PROJECT_ID}"
+      ZITADEL_DOMAIN: "${ZITADEL_DOMAIN}"
+      ZITADEL_TOKEN_URL: "${ZITADEL_DOMAIN}/oauth/v2/token"
+      ZITADEL_AUTH_URL: "${ZITADEL_DOMAIN}/oauth/v2/authorize"
+      ZITADEL_JWK_URL: "${ZITADEL_DOMAIN}/oauth/v2/keys"
+      ZITADEL_REVOKE_URL: "${ZITADEL_DOMAIN}/oauth/v2/revoke"
+      CLIENT_ID: "${CLIENT_ID}"
+      CLIENT_SECRET: "${APP_A_CLIENT_SECRET}"
+      ZITADEL_INTROSPECTION_URL: "${ZITADEL_DOMAIN}/oauth/v2/introspect"
+      API_CLIENT_ID: "${API_CLIENT_ID}"
+      API_CLIENT_SECRET: "${API_CLIENT_SECRET}"
       ALGORITHM: "RS256"
-      HTTP_CLIENT_URL: "zitadel.godfather.novelcore.org"
+      HTTP_CLIENT_URL: "${ZITADEL_HOST}"
       HTTP_CLIENT_KEYS_ENDPOINT: "/oauth/v2/keys"
       HTTP_CLIENT_TOKEN: "/oauth/v2/token"
     logging: *default-logging
@@ -51,19 +51,19 @@ services:
       - loki
     environment:
       APP_NAME: "app-b"
-      PROJECT_ID: "250134510207762737"
-      ZITADEL_DOMAIN: "https://zitadel.godfather.novelcore.org"
-      ZITADEL_TOKEN_URL: "https://zitadel.godfather.novelcore.org/oauth/v2/token"
-      ZITADEL_AUTH_URL: "https://zitadel.godfather.novelcore.org/oauth/v2/authorize"
-      ZITADEL_JWK_URL: "https://zitadel.godfather.novelcore.org/oauth/v2/keys"
-      ZITADEL_REVOKE_URL: "https://zitadel.godfather.novelcore.org/oauth/v2/revoke"
-      CLIENT_ID: "homelander"
-      CLIENT_SECRET: "4P4ms0gnXfabZHpFFhJgXeIVS18uqz3UnlXf7bsCIZePQ6gwUkBBFr5aekEwa4dR"
-      ZITADEL_INTROSPECTION_URL: "https://zitadel.godfather.novelcore.org/oauth/v2/introspect"
-      API_CLIENT_ID: "250135022969880881@masterplan"
-      API_CLIENT_SECRET: "hDIxptx67wWS5vaxZDWHVAcAik0JnL7VUd7ya2sPOPtWxys0s5VujpBixa7tNtoA"
+      PROJECT_ID: "${PROJECT_ID}"
+      ZITADEL_DOMAIN: "${ZITADEL_DOMAIN}"
+      ZITADEL_TOKEN_URL: "${ZITADEL_DOMAIN}/oauth/v2/token"
+      ZITADEL_AUTH_URL: "${ZITADEL_DOMAIN}/oauth/v2/authorize"
+      ZITADEL_JWK_URL: "${ZITADEL_DOMAIN}/oauth/v2/keys"
+      ZITADEL_REVOKE_URL: "${ZITADEL_DOMAIN}/oauth/v2/revoke"
+      CLIENT_ID: "${CLIENT_ID}"
+      CLIENT_SECRET: "${APP_B_CLIENT_SECRET}"
+      ZITADEL_INTROSPECTION_URL: "${ZITADEL_DOMAIN}/oauth/v2/introspect"
+      API_CLIENT_ID: "${API_CLIENT_ID}"
+      API_CLIENT_SECRET: "${API_CLIENT_SECRET}"
       ALGORITHM: "RS256"
-      HTTP_CLIENT_URL: "zitadel.godfather.novelcore.org"
+      HTTP_CLIENT_URL: "${ZITADEL_HOST}"
       HTTP_CLIENT_KEYS_ENDPOINT: "/oauth/v2/keys"
       HTTP_CLIENT_TOKEN: "/oauth/v2/token"
     logging: *default-logging
@@ -104,4 +104,3 @@ services:
       - loki
       - prometheus
     logging: *default-logging
-    
