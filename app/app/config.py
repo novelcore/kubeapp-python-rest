@@ -45,6 +45,9 @@ class AppConfig:
         self.consumer_logger = None
         self.producer_logger = None
         self.port = None
+        # feature flags
+        self.auth_enabled = False
+        self.observability_enabled = False
 
 
     def load(self):
@@ -72,8 +75,10 @@ class AppConfig:
         self.http_client_url = os.environ.get("HTTP_CLIENT_URL")
         self.http_client_keys_endpoint = os.environ.get("HTTP_CLIENT_KEYS_ENDPOINT")
         self.http_client_token = os.environ.get("HTTP_CLIENT_TOKEN")
-        # observability configuration
+        # feature flags
+        self.auth_enabled = os.environ.get("ZITADEL_ENABLED", "false").lower() == "true"
         self.observability_enabled = os.environ.get("OBSERVABILITY", "false").lower() == "true"
+        # observability configuration
         self.otlp_grpc_endpoint = os.environ.get("OTLP_GRPC_ENDPOINT", "http://tempo:4317")
         self.logger_name = f'{self.app_name}-logger'
         self.port = os.environ.get("PORT", "8000")

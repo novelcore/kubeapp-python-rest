@@ -1,25 +1,22 @@
 import logging
 import uvicorn
 from fastapi import FastAPI
-from app.core.otlp.utils import PrometheusMiddleware, metrics, setting_otlp, EndpointFilter
 from app.config import app_config
 from app.core.fastapi.routers import health
 
 app = FastAPI()
 
-# Setting metrics middleware (only if observability is enabled)
+# Observability — only loaded when OBSERVABILITY=true
 if app_config.observability_enabled:
+    from app.core.otlp.utils import PrometheusMiddleware, metrics, setting_otlp, EndpointFilter
     app.add_middleware(PrometheusMiddleware, app_name=app_config.app_name)
     app.add_route("/metrics", metrics)
+
 # include routers
 app.include_router(health.router)
 
-# Setting OpenTelemetry exporter (only if observability is enabled)
 if app_config.observability_enabled:
     setting_otlp(app, app_config.app_name, app_config.otlp_grpc_endpoint)
-
-# Filter out /endpoint (only if observability is enabled)
-if app_config.observability_enabled:
     logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
 def start():
     # update uvicorn access logger format

@@ -26,6 +26,8 @@ services:
       - loki
     environment:
       APP_NAME: "app-a"
+      ZITADEL_ENABLED: "${ZITADEL_ENABLED:-false}"
+      OBSERVABILITY: "${OBSERVABILITY:-false}"
       PROJECT_ID: "${PROJECT_ID}"
       ZITADEL_DOMAIN: "${ZITADEL_DOMAIN}"
       ZITADEL_TOKEN_URL: "${ZITADEL_DOMAIN}/oauth/v2/token"
@@ -51,6 +53,8 @@ services:
       - loki
     environment:
       APP_NAME: "app-b"
+      ZITADEL_ENABLED: "${ZITADEL_ENABLED:-false}"
+      OBSERVABILITY: "${OBSERVABILITY:-false}"
       PROJECT_ID: "${PROJECT_ID}"
       ZITADEL_DOMAIN: "${ZITADEL_DOMAIN}"
       ZITADEL_TOKEN_URL: "${ZITADEL_DOMAIN}/oauth/v2/token"
