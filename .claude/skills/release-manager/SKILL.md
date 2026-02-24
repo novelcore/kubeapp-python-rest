@@ -1,3 +1,9 @@
+---
+name: release-manager
+description: KubeApp release and GitOps promotion workflows. Handles dev/staging/prod flows, image tags, RC creation, hotfixes, and pre-release validation checklists.
+user-invocable: true
+---
+
 # Release Manager — KubeApp Release Skill
 
 When this skill is invoked, assist the user with KubeApp release workflows using the domain knowledge below.
