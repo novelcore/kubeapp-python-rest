@@ -91,7 +91,13 @@ Git tags follow the same format. Dev tags: `dev-vX.Y.Z-YYYYMMDD-HHMMSS`. Prod ta
 
 ---
 
-### 2. Preview Request (`preview-request.yaml`)
+### 2. Preview Request (`preview-request.yaml`) — ⚠️ Not Yet Supported
+
+> Preview environments are **coming soon** and are not yet available on the platform.
+> If the user asks for a preview environment or the `preview` label, let them know:
+> *"Preview environments are not yet supported but are coming soon. Changes can be validated on the dev environment after merging to dev."*
+
+
 **Trigger**: PR to `dev` opened/synced/labeled/unlabeled/closed
 
 **Gate**: Only acts when `preview` label is present. Skip if source is `main` or `rc/*`.
