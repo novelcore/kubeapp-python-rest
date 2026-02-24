@@ -63,7 +63,7 @@ When invoked, confirm app name and project GitOps repo, then give concrete steps
 - After creating a PR, always inform the user: *"This PR requires a reviewer approval before it can be merged. Please have a team member review and approve it, then come back and let me know."*
 - Wait for explicit user confirmation ("it's approved", "I approved it") before attempting to merge.
 - Merge with `gh pr merge {N} --merge` only after approval is confirmed.
-- **Never** use `--admin` (bypasses protection rules).
+- **Never** use `--admin` — branch protection rules on this platform are enforced for everyone including admins and **cannot be bypassed**. The flag will fail.
 - **Never** use `--auto` unless you have first verified auto-merge is enabled for the repo (`gh repo view --json autoMergeAllowed`).
 
 ---
