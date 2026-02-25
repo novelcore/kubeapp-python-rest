@@ -149,6 +149,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: '0'
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
 
       - name: Set branch type
         id: set-branch-type
@@ -264,7 +265,7 @@ jobs:
         run: |
           NEW_VERSION="${{ steps.calculate-version.outputs.new_version }}"
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-          SHORT_SHA="${{ github.sha }}"
+          SHORT_SHA="${{ github.event.pull_request.merge_commit_sha }}"
           
           # Debug variable values before constructing image name
           echo "🔍 Debug values for image construction:"
@@ -308,6 +309,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
       
       - name: Debug environment variables
         run: |
