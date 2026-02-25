@@ -189,7 +189,7 @@ jobs:
 
   # Handle merged hotfix to main
   deploy-hotfix:
-    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'hotfix/')
+    if: github.event_name == 'pull_request_target' && github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'hotfix/')
     runs-on: ubuntu-latest
     outputs:
       production_tag: ${{ steps.create-tag.outputs.production_tag }}
@@ -199,6 +199,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: '0'
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
       
       - name: Extract hotfix version
         id: extract-version

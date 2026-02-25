@@ -77,7 +77,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: '0'  # Full history for tag detection
-      
+          ref: ${{ github.event.pull_request.head.sha }}
+
       - name: Extract semantic version from branch name
         id: extract-version
         run: |
@@ -238,7 +239,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
       - name: Set build variables
         run: |
           # KUBECORE_REGISTRY already contains full repository path
